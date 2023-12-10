@@ -142,8 +142,8 @@ public class VueControleur extends JFrame implements Observer {
         icoMur = chargerIcone("Images/Mur.png");
         icoCaseUnique = chargerIcone("Images/Piege_de_feu.png");
         icoCaseUniqueUtilise = chargerIcone("Images/Feu.png");
-        icoPorte = chargerIcone("Images/porte_fermee.png");
-        icoPorteOuverte = chargerIcone("Images/porte_ouverte.png");
+        icoPorte = chargerIcone("Images/Porte_Fermee.png");
+        icoPorteOuverte = chargerIcone("Images/Porte_Ouverte.png");
         icoCapsuleEau = chargerIcone("Images/Capsule_eau.png");
         icoCle = chargerIcone("Images/Cle.png");
         icoCoffre = chargerIcone("Images/Coffre.png");

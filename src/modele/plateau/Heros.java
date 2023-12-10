@@ -5,6 +5,12 @@
  */
 package modele.plateau;
 
+import java.awt.*;
+import java.util.Comparator;
+import java.util.LinkedList;
+import java.util.PriorityQueue;
+import java.util.Queue;
+
 /**
  * Héros du jeu
  * Il posséde un inventaire, un statut (empoisonné,...),un nombre de vies,...
@@ -151,11 +157,10 @@ public class Heros {
         EntiteStatique e = jeu.getEntite(x, y);
         if(e instanceof Levier){
             if(((Levier) e).getActive() == false) {
-                ((Levier) e).activerLevier();
                 EntiteStatique[][] GrilleEntitesStatiques = getJeu().getGrilleEntitesStatiques();
-                for(int i = 0; i < getJeu().SIZE_X; i++){
-                    for(int j = 0; j < getJeu().SIZE_Y; j++){
-                        if(GrilleEntitesStatiques[i][j] instanceof Porte){
+                for(int i = 0; i < getJeu().SIZE_X; i++) {
+                    for (int j = 0; j < getJeu().SIZE_Y; j++) {
+                        if (GrilleEntitesStatiques[i][j] instanceof Porte) {
                             ((Porte) GrilleEntitesStatiques[i][j]).porteOuverte();
                         }
                     }
@@ -226,6 +231,161 @@ public class Heros {
             sac_a_dos.ajoutObjet(new CapsuleEau());
         }
     }
+
+    /*
+    public Coord2D checkPath(int dest_x, int dest_y) {
+        int delta;
+        Coord2D lastStep = new Coord2D(0, 0);
+        EntiteStatique grid[][] = jeu.getGrilleEntitesStatiques();
+        if(dest_x == x) {
+            lastStep.x = x;
+            lastStep.y = y;
+            delta = dest_y - y;
+            if (delta < 0) {
+                for (int i = 0; i > delta; i--) {
+                    if (!(grid[x][y - i - 1].traversable()) || grid[x][y - i] instanceof Levier) return lastStep;
+                    lastStep.y = y - i;
+                }
+                return lastStep;
+            } else {
+                for (int i = 0; i <= delta; i++) {
+                    if (!(grid[x][y + i + 1].traversable()) || grid[x][y + i] instanceof Levier) return lastStep;
+                    lastStep.y = y + i;
+                }
+                return lastStep;
+            }
+        } else if(dest_y == y) {
+            lastStep.x = x;
+            lastStep.y = y;
+            delta = dest_x - x;
+            if(delta < 0) {
+                for (int i = 0; i > delta; i--) {
+                    if (!(grid[x - i - 1][y].traversable()) || grid[x - i][y] instanceof Levier) return lastStep;
+                    lastStep.x = x - i;
+                }
+                return lastStep;
+            } else {
+                for(int i = 0; i < delta; i++) {
+                    if (!(grid[x + i + 1][y].traversable()) || grid[x + i][y] instanceof Levier) return lastStep;
+                    lastStep.x = x + i;
+                }
+                return lastStep;
+            }
+        } else {
+            return null;
+        }
+    }
+
+    public char pathFind(int dest_x, int dest_y) {
+        Coord2D tmpPos;
+        tmpPos = checkPath(x, y);
+        if(tmpPos == null) {
+            System.out.println("checkPath returned null");
+            return (char)0;
+        }
+        System.out.println(tmpPos.x + " " + tmpPos.y);
+        Coord2D delta = new Coord2D(tmpPos.x - x, tmpPos.y - y);
+        System.out.println(delta.x + " " + delta.y);
+        if(delta.x == 0 && delta.y != 0) {
+            if(delta.y < 0) return 'B';
+            else return 'H';
+        } else if(delta.y == 0) {
+            if(delta.x < 0) return 'G';
+            else return 'D';
+        } else return pathFind(x, dest_y);
+    }
+
+    public void moveTo(int dest_x, int dest_y) {
+        EntiteStatique grid[][] = jeu.getGrilleEntitesStatiques();
+        if(!(grid[dest_x][dest_y].traversable())) {
+            System.out.println("moveTo: you're trying to go to an inaccessible case");
+            return;
+        }
+        char dest = pathFind(dest_x, dest_y);
+        switch(dest) {
+            case 'H':
+                deplacerHero.haut();
+                break;
+            case 'B':
+                deplacerHero.bas();
+                break;
+            case 'D':
+                deplacerHero.droite();
+                break;
+            case 'G':
+                deplacerHero.gauche();
+                break;
+            default:
+                System.out.println("pathFind returned 0");
+                return;
+        }
+    }
+    */
+    private Queue<Coord2D> fetchVoisins(Coord2D node) {
+        Queue<Coord2D> res = new LinkedList<Coord2D>();
+        if(node.x - 1 > 0) res.add(new Coord2D(node.x - 1, node.y));
+        if(node.x + 1 < jeu.SIZE_X) res.add(new Coord2D(node.x + 1, node.y));
+        if(node.y - 1 > 0) res.add(new Coord2D(node.x, node.y - 1));
+        if(node.y + 1 < jeu.SIZE_Y) res.add(new Coord2D(node.x, node.y + 1));
+        return res;
+    }
+
+    private boolean containsLess(Queue<Coord2D> queue, Coord2D elt) {
+        if(!queue.contains(elt)) return false;
+        Queue<Coord2D> copy = new LinkedList<Coord2D>(queue);
+        while(!copy.isEmpty()) {
+            Coord2D e = copy.remove();
+            if(e.x == elt.x && e.y == elt.y && e.cout <= elt.cout) return true;
+        }
+        return false;
+    }
+
+    public Queue<Coord2D> pathFind(Coord2D dest) {
+        EntiteStatique grid[][] = jeu.getGrilleEntitesStatiques();
+        Comparator<Coord2D> comparator = new Coord2DComparator();
+        PriorityQueue<Coord2D> openList = new PriorityQueue<Coord2D>(comparator);
+        Queue<Coord2D> closedList = new LinkedList<Coord2D>();
+        Coord2D start = new Coord2D(x, y, 0, 0);
+        assert(grid[dest.x][dest.y].traversable());
+
+        openList.add(start);
+        while(!openList.isEmpty()) {
+            Coord2D tmp = openList.remove();
+            System.out.println(tmp.x + " " + tmp.y);
+            if(tmp.x == dest.x && tmp.y == dest.y) {
+                return closedList;
+            }
+            Queue<Coord2D> voisins = fetchVoisins(tmp);
+            for(Coord2D v: voisins) {
+                if(grid[v.x][v.y].traversable() && !(grid[v.x][v.y] instanceof Levier) && !(closedList.contains(v) || containsLess(openList, v))) {
+                    v.cout = tmp.cout + 1;
+                    v.manhattanDistance(v, dest);
+                    v.heuristique += v.cout;
+                    openList.add(v);
+                }
+            }
+            closedList.add(tmp);
+        }
+        System.out.println("pathFind did not find a path");
+        return null;
+
+    }
+
+    public void moveTo(Coord2D dest) {
+        EntiteStatique grid[][] = jeu.getGrilleEntitesStatiques();
+        assert(grid[dest.x][dest.y].traversable());
+        Coord2D delta = new Coord2D(dest.x - x, dest.y - y);
+        if(delta.x == 0 && delta.y != 0) {
+            if(y < 0) deplacerHero.haut();
+            else deplacerHero.bas();
+        } else if(delta.y == 0) {
+            if(x < 0) deplacerHero.gauche();
+            else deplacerHero.droite();
+        } else {
+            System.out.println("Can't move here");
+        }
+    }
+
 }
 
 

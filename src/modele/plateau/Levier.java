@@ -8,8 +8,6 @@ package modele.plateau;
 public class Levier extends EntiteStatique {
     private boolean active;
 
-
-
     /**
      * Constructeur de Levier
      * @param _jeu
@@ -23,7 +21,8 @@ public class Levier extends EntiteStatique {
         return active;
     }
 
-    public void activerLevier(){
+    public void activerLevier()
+    {
         active = true;
     }
 

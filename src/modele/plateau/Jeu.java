@@ -8,6 +8,7 @@ package modele.plateau;
 import Util.Outils;
 
 import java.util.Observable;
+import java.util.Queue;
 
 /**
  * Nerf central des modèles
@@ -253,14 +254,19 @@ public class Jeu extends Observable implements Runnable {
     public void run() {
 
         while (true) {
+            Coord2D dest = new Coord2D(10, 7);
             setChanged();
             notifyObservers();
-            if(getHeros().getNbVie() < 1){
+            if(getHeros().getNbVie() < 1) {
                 restart();
             }
 
+            Queue<Coord2D> path = getHeros().pathFind(dest);
+            Coord2D next = path.remove();
+            System.out.println(next.x + " " + next.y);
+
             try {
-                Thread.sleep(pause);
+                Thread.sleep(pause + 2000);
             } catch (InterruptedException e) {
                 e.printStackTrace();
             }
