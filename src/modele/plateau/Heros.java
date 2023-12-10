@@ -53,7 +53,7 @@ public class Heros {
      * @param _x coordonnées du heros
      * @param _y coordonnées du heros
      */
-    public Heros(Jeu _jeu, int _x, int _y, char _couleur) {
+    public Heros(Jeu _jeu, int _x, int _y, int _indice, char _couleur) {
         jeu = _jeu;
         x = _x;
         y = _y;
@@ -71,6 +71,7 @@ public class Heros {
             }
         }
         explored[x][y] = true;
+        indice = _indice;
     }
 
 
@@ -118,6 +119,8 @@ public class Heros {
     public Jeu getJeu() {
         return jeu;
     }
+
+    public int getIndice() {return indice;}
 
 
 
@@ -474,6 +477,7 @@ public class Heros {
     public void explore() {
         Random rand = new Random();
         boolean moved = false;
+        // exploredThreshold =
         while(!moved) {
             int choice = rand.nextInt(0, 4);
             System.out.println(choice);

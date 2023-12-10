@@ -42,9 +42,9 @@ public class Salle{
 
     /**
      * Méthode qui génère une salle aléatoirement
-     * @param heros
+     * @param
      */
-    public void salleAleatoire(Heros heros){
+    public void salleAleatoire(Heros heros1, Heros heros2, Heros heros3, Heros heros4){
 
         jeu.reinitialisationDeSalle();                                  //Réinisialise le tableau contenant la salle précédente
 
@@ -101,11 +101,25 @@ public class Salle{
                         }
                         break;
 
-                    //Placer le joueur
+                    //Placer les agents
                     case 'J':
                         jeu.grilleEntitesStatiques[i][j] = new CaseNormale(jeu);
-                        heros.setX(i);
-                        heros.setY(j);
+                        if(indice_courant == 1) {
+                            heros1.setX(i);
+                            heros1.setY(j);
+                        }
+                        if(indice_courant == 2) {
+                            heros2.setX(i);
+                            heros2.setY(j);
+                        }
+                        if(indice_courant == 3) {
+                            heros3.setX(i);
+                            heros3.setY(j);
+                        }
+                        if(indice_courant == 4) {
+                            heros4.setX(i);
+                            heros4.setY(j);
+                        }
                         break;
 
                     //Placer un levier
@@ -275,9 +289,9 @@ Salle rectangle avec Objets :
 MMMMMMMMMMMMMMMMMMMM
 MLVPVVVVVVVVVVVVVVVM
 MMMMVLVVVVVVVVVVVVVM
-MVVVVVVVVVVVVVVVVVVM
-PJVVVVVVVVVVVVVVVVOP
-MVVVVVVVVVVVVVVVVVVM
+MJVVVVVVVVVVVVVVVVVM
+PJVJVVVVVVVVVVVVVVOP
+MJVVVVVVVVVVVVVVVVVM
 MMMMMMMMMPMMMMMMMMMM
 MVVVVLVVVVVVVVVVVVVM
 MVVVVVVVVVVVVVVVVVVM
@@ -287,9 +301,9 @@ Salle rectangle indices :
 00000000000000000000
 01020000000000000000
 00000300000000000000
-00000000000000000000
-00000000000000000001
-00000000000000000000
+01000000000000000000
+02030000000000000001
+01000000000000000000
 00000000030000000000
 00000200000000000000
 00000000000000000000
@@ -309,6 +323,7 @@ AAAAAAAAAAAAAAAAAAAA
 
 */
 
+
 /* Ce a quoi ressemble une salle ronde
 
 salle ronde vide :
@@ -324,27 +339,28 @@ MMMVVVVVVVVVVVVVVMMM
 MMMMMMMMMMMMMMMMMMMM
  */
 
+
 /* Ce a quoi ressemble une salle Separation
 MMMMMMMMMMMMMMMMMMMM
-MVVLMVVVVVVVMVVVVVVM
+MJVLMVVVVVVVMVVVVVVM
 MJVVPVVVVVVVPVVVVVVM
 MVVVMVVVVVVLMVVVVVVM
 MMMMMMMMMMMMMVVVVVOP
 MVVVMVVVVLVVMVVVVVVM
 MJVVMVVVVVVVMLVVVVVM
-MVVVPVVVVVVVMVVVVVVM
+MJVVPVVVVVVVMVVVVVVM
 MVVLMVVVVVVVPVVVVVVM
 MMMMMMMMMMMMMMMMMMMM
 
 Indices :
 00000000000000000000
-00010000000000000000
-00005000000030000000
+01010000000000000000
+02005000000030000000
 00000000000200000000
 00000000000000000004
 00000000030000000000
-00000000000004000000
-00001000000000000000
+03000000000004000000
+04001000000000000000
 00050000000020000000
 00000000000000000000
 
@@ -374,15 +390,27 @@ MVVVVVVVVMVOVVVVVVOP
 MMMMMMMMMMMMMMMMMMMM
  */
 
+
 /* Ce a quoi ressemble une salle aux trésors (sortie)
 MVVVVVVVVVVVVVVVVVVV
 MVVVVVVVVVVVVVVVVVVV
 MVVVVVVVVVVVVVVVVVVV
-MVVVVVVVVVVVVVVVVVVV
-PJVVVVVVVVVVVVVVVVVV
-MVVVVVVVVVVVVVVVVVVV
-MVVVVVVVVVVVVVVVVVVV
-MVVVVVVVVVVVVVVVVVVV
+MJVVVVVVVVVVVVVVVVVV
+PJVJVVVVVVVVVVVVVVVV
+MJVVVVVVVVVVVVVVVVVV
 MVVVVVVVVVVVVVVVVVVV
 MVVVVVVVVVVVVVVVVVVV
+MVVVVVVVVVVVVVVVVVVV
+MVVVVVVVVVVVVVVVVVVV
+
+00000000000000000000
+00000000000000000000
+00000000000000000000
+01000000000000000000
+02030000000000000000
+04000000000000000000
+00000000000000000000
+00000000000000000000
+00000000000000000000
+00000000000000000000
  */

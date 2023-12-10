@@ -29,7 +29,10 @@ public class VueControleur extends JFrame implements Observer {
     private final int sizeY; // taille de la grille affichée
 
     // icones affichées dans la grille
-    private ImageIcon icoHero;
+    private ImageIcon icoHero1;
+    private ImageIcon icoHero2;
+    private ImageIcon icoHero3;
+    private ImageIcon icoHero4;
     private ImageIcon icoCaseNormale;
     private ImageIcon icoMur;
     private ImageIcon icoCaseUniqueUtilise;
@@ -143,12 +146,25 @@ public class VueControleur extends JFrame implements Observer {
      * Charge toutes les icônes
      */
     private void chargerLesIcones() {
-        for(int i = 0; i < 4; i++) {
-            if (jeu.getHeros(i).getCouleur() == 'V') {
-                icoHero = chargerIcone("Images/agent_vert_est.png");
-            } else {
-                icoHero = chargerIcone("Images/agent_rouge_est.png");
-            }
+        if (jeu.getHeros(0).getCouleur() == 'V') {
+            icoHero1 = chargerIcone("Images/agent_vert_est.png");
+        } else {
+            icoHero1 = chargerIcone("Images/agent_rouge_est.png");
+        }
+        if (jeu.getHeros(1).getCouleur() == 'V') {
+            icoHero2 = chargerIcone("Images/agent_vert_est.png");
+        } else {
+            icoHero2 = chargerIcone("Images/agent_rouge_est.png");
+        }
+        if (jeu.getHeros(2).getCouleur() == 'V') {
+            icoHero3 = chargerIcone("Images/agent_vert_est.png");
+        } else {
+            icoHero3 = chargerIcone("Images/agent_rouge_est.png");
+        }
+        if (jeu.getHeros(3).getCouleur() == 'V') {
+            icoHero4 = chargerIcone("Images/agent_vert_est.png");
+        } else {
+            icoHero4 = chargerIcone("Images/agent_rouge_est.png");
         }
         icoCaseNormale = chargerIcone("Images/Sol.png");
         icoMur = chargerIcone("Images/Mur.png");
@@ -187,40 +203,137 @@ public class VueControleur extends JFrame implements Observer {
      * Charge l'image du héro en fonction de son orientation
      */
     private void chargerHero(){
-        for(int i = 0; i < 4; i++) {
-            char orientation = jeu.getHeros(i).getOrientation();
+            char orientation = jeu.getHeros(0).getOrientation();
             switch (orientation) {
                 case 'E':
-                    if (jeu.getHeros(i).getCouleur() == 'V') {
-                        icoHero = chargerIcone("Images/agent_vert_est.png");
+                    if (jeu.getHeros(0).getCouleur() == 'V') {
+                        icoHero1 = chargerIcone("Images/agent_vert_est.png");
                     } else {
-                        icoHero = chargerIcone("Images/agent_rouge_est.png");
+                        icoHero1 = chargerIcone("Images/agent_rouge_est.png");
                     }
                     break;
                 case 'O':
-                    if (jeu.getHeros(i).getCouleur() == 'V') {
-                        icoHero = chargerIcone("Images/agent_vert_ouest.png");
+                    if (jeu.getHeros(0).getCouleur() == 'V') {
+                        icoHero1 = chargerIcone("Images/agent_vert_ouest.png");
                     } else {
-                        icoHero = chargerIcone("Images/agent_rouge_ouest.png");
+                        icoHero1 = chargerIcone("Images/agent_rouge_ouest.png");
                     }
                     break;
                 case 'N':
-                    if (jeu.getHeros(i).getCouleur() == 'V') {
-                        icoHero = chargerIcone("Images/agent_vert_nord.png");
+                    if (jeu.getHeros(0).getCouleur() == 'V') {
+                        icoHero1 = chargerIcone("Images/agent_vert_nord.png");
                     } else {
-                        icoHero = chargerIcone("Images/agent_rouge_nord.png");
+                        icoHero1 = chargerIcone("Images/agent_rouge_nord.png");
                     }
                     break;
                 case 'S':
-                    if (jeu.getHeros(i).getCouleur() == 'V') {
-                        icoHero = chargerIcone("Images/agent_vert_sud.png");
+                    if (jeu.getHeros(0).getCouleur() == 'V') {
+                        icoHero1 = chargerIcone("Images/agent_vert_sud.png");
                     } else {
-                        icoHero = chargerIcone("Images/agent_rouge_sud.png");
+                        icoHero1 = chargerIcone("Images/agent_rouge_sud.png");
                     }
                     break;
                 default:
                     break;
             }
+        orientation = jeu.getHeros(1).getOrientation();
+        switch (orientation) {
+            case 'E':
+                if (jeu.getHeros(1).getCouleur() == 'V') {
+                    icoHero2 = chargerIcone("Images/agent_vert_est.png");
+                } else {
+                    icoHero2 = chargerIcone("Images/agent_rouge_est.png");
+                }
+                break;
+            case 'O':
+                if (jeu.getHeros(1).getCouleur() == 'V') {
+                    icoHero2 = chargerIcone("Images/agent_vert_ouest.png");
+                } else {
+                    icoHero2 = chargerIcone("Images/agent_rouge_ouest.png");
+                }
+                break;
+            case 'N':
+                if (jeu.getHeros(1).getCouleur() == 'V') {
+                    icoHero2 = chargerIcone("Images/agent_vert_nord.png");
+                } else {
+                    icoHero2 = chargerIcone("Images/agent_rouge_nord.png");
+                }
+                break;
+            case 'S':
+                if (jeu.getHeros(1).getCouleur() == 'V') {
+                    icoHero2 = chargerIcone("Images/agent_vert_sud.png");
+                } else {
+                    icoHero2 = chargerIcone("Images/agent_rouge_sud.png");
+                }
+                break;
+            default:
+                break;
+        }
+        orientation = jeu.getHeros(2).getOrientation();
+        switch (orientation) {
+            case 'E':
+                if (jeu.getHeros(2).getCouleur() == 'V') {
+                    icoHero3 = chargerIcone("Images/agent_vert_est.png");
+                } else {
+                    icoHero3 = chargerIcone("Images/agent_rouge_est.png");
+                }
+                break;
+            case 'O':
+                if (jeu.getHeros(2).getCouleur() == 'V') {
+                    icoHero3 = chargerIcone("Images/agent_vert_ouest.png");
+                } else {
+                    icoHero3 = chargerIcone("Images/agent_rouge_ouest.png");
+                }
+                break;
+            case 'N':
+                if (jeu.getHeros(2).getCouleur() == 'V') {
+                    icoHero3 = chargerIcone("Images/agent_vert_nord.png");
+                } else {
+                    icoHero3 = chargerIcone("Images/agent_rouge_nord.png");
+                }
+                break;
+            case 'S':
+                if (jeu.getHeros(2).getCouleur() == 'V') {
+                    icoHero3 = chargerIcone("Images/agent_vert_sud.png");
+                } else {
+                    icoHero3 = chargerIcone("Images/agent_rouge_sud.png");
+                }
+                break;
+            default:
+                break;
+        }
+        orientation = jeu.getHeros(3).getOrientation();
+        switch (orientation) {
+            case 'E':
+                if (jeu.getHeros(3).getCouleur() == 'V') {
+                    icoHero4 = chargerIcone("Images/agent_vert_est.png");
+                } else {
+                    icoHero4 = chargerIcone("Images/agent_rouge_est.png");
+                }
+                break;
+            case 'O':
+                if (jeu.getHeros(3).getCouleur() == 'V') {
+                    icoHero4 = chargerIcone("Images/agent_vert_ouest.png");
+                } else {
+                    icoHero4 = chargerIcone("Images/agent_rouge_ouest.png");
+                }
+                break;
+            case 'N':
+                if (jeu.getHeros(3).getCouleur() == 'V') {
+                    icoHero4 = chargerIcone("Images/agent_vert_nord.png");
+                } else {
+                    icoHero4 = chargerIcone("Images/agent_rouge_nord.png");
+                }
+                break;
+            case 'S':
+                if (jeu.getHeros(3).getCouleur() == 'V') {
+                    icoHero4 = chargerIcone("Images/agent_vert_sud.png");
+                } else {
+                    icoHero4 = chargerIcone("Images/agent_rouge_sud.png");
+                }
+                break;
+            default:
+                break;
         }
     }
 
@@ -328,9 +441,10 @@ public class VueControleur extends JFrame implements Observer {
      */
     void mettreAJourHero(){
         chargerHero(); // Met à jour l'image du héro en fonction de son orientation
-        for(int i = 0; i < 4; i++) {
-            tabJLabel[jeu.getHeros(i).getX()][jeu.getHeros(i).getY()].setIcon(icoHero);
-        }
+        tabJLabel[jeu.getHeros(0).getX()][jeu.getHeros(0).getY()].setIcon(icoHero1);
+        tabJLabel[jeu.getHeros(1).getX()][jeu.getHeros(1).getY()].setIcon(icoHero2);
+        tabJLabel[jeu.getHeros(2).getX()][jeu.getHeros(2).getY()].setIcon(icoHero3);
+        tabJLabel[jeu.getHeros(3).getX()][jeu.getHeros(3).getY()].setIcon(icoHero4);
         //nbCapsule.setText("Nombre de capsule eau : "+jeu.getHeros().getSac_a_dos().getNbCapsuleEau()); // Met à jour son nombre de capsule d'eau
         //nbCle.setText("Nombre de clé : "+jeu.getHeros().getSac_a_dos().getNbCle()); // Met à jour son nombre de clé
         //nbVie.setText("Vie : "+jeu.getHeros().getNbVie()); // Met à jour son nombre de vie
