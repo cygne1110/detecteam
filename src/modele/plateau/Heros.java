@@ -26,6 +26,8 @@ public class Heros {
     private ActionHero action; // Les actions que le héro peut faire
     private Deplacement deplacerHero; // Les déplacement que le héro peut faire
 
+    private char couleur;
+
     private Jeu jeu;
 
 
@@ -40,7 +42,7 @@ public class Heros {
      * @param _x coordonnées du heros
      * @param _y coordonnées du heros
      */
-    public Heros(Jeu _jeu, int _x, int _y) {
+    public Heros(Jeu _jeu, int _x, int _y, char _couleur) {
         jeu = _jeu;
         x = _x;
         y = _y;
@@ -50,6 +52,7 @@ public class Heros {
         typeStatut = 'N';
         action = new ActionHero(this);
         deplacerHero = new Deplacement(this);
+        couleur = _couleur;
     }
 
 
@@ -89,6 +92,9 @@ public class Heros {
 
 
     public Deplacement getDeplacerHero() { return deplacerHero; }
+
+
+    public char getCouleur() { return couleur; }
 
 
     public Jeu getJeu() {
@@ -156,12 +162,17 @@ public class Heros {
     public void EstSurLevier(int x,int y){
         EntiteStatique e = jeu.getEntite(x, y);
         if(e instanceof Levier){
-            if(((Levier) e).getActive() == false) {
-                EntiteStatique[][] GrilleEntitesStatiques = getJeu().getGrilleEntitesStatiques();
-                for(int i = 0; i < getJeu().SIZE_X; i++) {
-                    for (int j = 0; j < getJeu().SIZE_Y; j++) {
-                        if (GrilleEntitesStatiques[i][j] instanceof Porte) {
-                            ((Porte) GrilleEntitesStatiques[i][j]).porteOuverte();
+            if(getCouleur() == ((Levier) e).getCouleur() || ((Levier) e).getCouleur() == 'B' || getCouleur() == 'B') {
+                if (((Levier) e).getActive() == false) {
+                    ((Levier) e).activerLevier();
+                    EntiteStatique[][] GrilleEntitesStatiques = getJeu().getGrilleEntitesStatiques();
+                    for (int i = 0; i < getJeu().SIZE_X; i++) {
+                        for (int j = 0; j < getJeu().SIZE_Y; j++) {
+                            if (GrilleEntitesStatiques[i][j] instanceof Porte) {
+                                if (((Porte) GrilleEntitesStatiques[i][j]).getIndice() == ((Levier) e).getIndice()) {
+                                    ((Porte) GrilleEntitesStatiques[i][j]).porteOuverte();
+                                }
+                            }
                         }
                     }
                 }
@@ -176,8 +187,11 @@ public class Heros {
      */
     public void EstSurPorte(int x,int y){
         if(jeu.getEntite(x, y) instanceof Porte){
-            jeu.getSalle().salleAleatoire(jeu.getHeros()); //On appelle la méthode qui créer les salles aléatoirement
-            resetHeroSalle();
+            EntiteStatique e = jeu.getEntite(x, y);
+            if(((Porte) e).getFinale()) {
+                jeu.getSalle().salleAleatoire(jeu.getHeros()); //On appelle la méthode qui créer les salles aléatoirement
+                resetHeroSalle();
+            }
         }
     }
 
