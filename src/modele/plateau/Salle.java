@@ -2,6 +2,8 @@ package modele.plateau;
 
 import Util.Outils;
 
+import java.util.concurrent.CopyOnWriteArraySet;
+
 /**
  * Classe qui permet la génération aléatoire d'une salle
  * @classe Salle
@@ -13,6 +15,8 @@ public class Salle{
 
     private Jeu jeu;
 
+    private String nomSalle;
+
 
 
     /**
@@ -20,10 +24,21 @@ public class Salle{
      * @param _jeu
      */
     public Salle(Jeu _jeu){
+
         jeu = _jeu;
+        nomSalle = "salleRectangle";
     }
 
+    /**
+     * Getter de nomSalle
+     */
+    public String getNomSalle(){ return nomSalle; }
 
+    /**
+     * Setter de nomSalle
+     * @param _nomSalle
+     */
+    public void setNomSalle( String _nomSalle){ nomSalle = _nomSalle; }
 
     /**
      * Méthode qui génère une salle aléatoirement
@@ -33,15 +48,22 @@ public class Salle{
 
         jeu.reinitialisationDeSalle();                                  //Réinisialise le tableau contenant la salle précédente
 
-
-        String nomSalle = AleaNomSalle();                               //Nom de la salle choisie aléatoirement
-
+        nomSalle = AleaNomSalle();                                      //Nom de la salle choisie aléatoirement
 
         char[][] tab = new char[SIZE_X][SIZE_Y];                        //Création du tableau qui stockera les caractères du fichier txt de la salle
-        Outils.convertionTxtToTableau2D(tab,SIZE_X,SIZE_Y,nomSalle);    //Permet de lire et d'écrire dans tab le fichier txt qui correspond à la salle choisie aléatoirement
+        Outils.convertionTxtToTableau2D(tab, SIZE_X, SIZE_Y, nomSalle,0);    //Permet de lire et d'écrire dans tab le fichier txt qui correspond à la salle choisie aléatoirement
 
+        char[][] tabCharIndice = new char[SIZE_X][SIZE_Y];
+        Outils.convertionTxtToTableau2D(tabCharIndice, SIZE_X, SIZE_Y, nomSalle, 1);
+        int[][] tabIndice = Outils.TabCharToTabInt(tabCharIndice);
+
+        char[][] tabCouleur = new char[SIZE_X][SIZE_Y];
+        Outils.convertionTxtToTableau2D(tabCouleur, SIZE_X, SIZE_Y, nomSalle, 2);
+        System.out.println(tab);
 
         char c;                                                         //caractère qui nous permet de savoir le type de l'élément à placer
+        int indice_courant;
+        char couleur_courante;
 
         int nb_cle = 1;
         int nb_coffre = Outils.nombreAleatoire(0,4);
@@ -60,6 +82,8 @@ public class Salle{
             for(int j = 0; j < SIZE_Y; j++){
 
                 c = tab[i][j];
+                indice_courant = tabIndice[i][j];
+                couleur_courante = tabCouleur[i][j];
 
                 switch (c){
 
@@ -70,7 +94,11 @@ public class Salle{
 
                     //Placer une porte
                     case 'P':
-                        jeu.addEntiteStatique(new Porte(jeu), i, j);
+                        if(couleur_courante == 'B'){
+                            jeu.addEntiteStatique(new Porte(jeu, indice_courant, couleur_courante, true), i, j);
+                        }else {
+                            jeu.addEntiteStatique(new Porte(jeu, indice_courant, couleur_courante, false), i, j);
+                        }
                         break;
 
                     //Placer le joueur
@@ -82,7 +110,7 @@ public class Salle{
 
                     //Placer un levier
                     case 'L':
-                        jeu.addEntiteStatique(new Levier(jeu), i, j);
+                        jeu.addEntiteStatique(new Levier(jeu,indice_courant, couleur_courante), i, j);
                         break;
 
                     //Placer différents types de cases
@@ -213,25 +241,25 @@ public class Salle{
      * @return nomSalle
      */
     private String AleaNomSalle() {
-
-        String nomSalle = "salleRectangle.txt";     //Valeur par défaut
-        int i = Outils.nombreAleatoire(1,5);        //Pour choisir le nom de la salle aléatoirement
+        nomSalle = "salleRectangle";     //Valeur par défaut
+        int i = Outils.nombreAleatoire(1,3);    //Pour choisir le nom de la salle aléatoirement
 
         switch (i) {
-            case 1 -> nomSalle = "salleRectangle.txt";
-            case 2 -> nomSalle = "salleRonde.txt";
-            case 3 -> nomSalle = "salleSatan.txt";
-            case 4 -> nomSalle = "salleLabyrinthe.txt";
-            case 5 -> nomSalle = "salleTresors.txt";
+            case 1 -> nomSalle = "salleRectangle";
+            //case 2 -> nomSalle = "salleRonde";
+            case 2 -> nomSalle = "salleSeparation";
+            //case 4 -> nomSalle = "salleLabyrinthe";
+            case 3 -> nomSalle = "salleTresors";
             default -> System.out.println("Chiffre incorrect");
         }
-
         return nomSalle;
     }
 }
 
 
 /* Ce a quoi ressemble une salle rectangle
+
+Salle rectangle vide :
 MMMMMMMMMMMMMMMMMMMM
 MVVVVVVVVVVVVVVVVVVM
 MVVVVVVVVVVVVVVVVVVM
@@ -242,9 +270,48 @@ MVVVVVVVVVVVVVVVVVVM
 MVVVVVVVVVVVVVVVVVVM
 MVVVVVVVVVVVVVVVVVVM
 MMMMMMMMMMMMMMMMMMMM
- */
+
+Salle rectangle avec Objets :
+MMMMMMMMMMMMMMMMMMMM
+MLVPVVVVVVVVVVVVVVVM
+MMMMVLVVVVVVVVVVVVVM
+MVVVVVVVVVVVVVVVVVVM
+PJVVVVVVVVVVVVVVVVOP
+MVVVVVVVVVVVVVVVVVVM
+MMMMMMMMMPMMMMMMMMMM
+MVVVVLVVVVVVVVVVVVVM
+MVVVVVVVVVVVVVVVVVVM
+MMMMMMMMMMMMMMMMMMMM
+
+Salle rectangle indices :
+00000000000000000000
+01020000000000000000
+00000300000000000000
+00000000000000000000
+00000000000000000001
+00000000000000000000
+00000000030000000000
+00000200000000000000
+00000000000000000000
+00000000000000000000
+
+Salle rectangle couleurs :
+AAAAAAAAAAAAAAAAAAAA
+ABAVAAAAAAAAAAAAAAAA
+AAAAARAAAAAAAAAAAAAA
+AAAAAAAAAAAAAAAAAAAA
+AAAAAAAAAAAAAAAAAAAB
+AAAAAAAAAAAAAAAAAAAA
+AAAAAAAAARAAAAAAAAAA
+AAAAAVAAAAAAAAAAAAAA
+AAAAAAAAAAAAAAAAAAAA
+AAAAAAAAAAAAAAAAAAAA
+
+*/
 
 /* Ce a quoi ressemble une salle ronde
+
+salle ronde vide :
 MMMMMMMMMMMMMMMMMMMM
 MMMVVVVVVVVVVVVVVMMM
 MMVVVVVVVVVVVVVVVVMM
@@ -257,17 +324,41 @@ MMMVVVVVVVVVVVVVVMMM
 MMMMMMMMMMMMMMMMMMMM
  */
 
-/* Ce a quoi ressemble une salle SATAN
+/* Ce a quoi ressemble une salle Separation
 MMMMMMMMMMMMMMMMMMMM
-MVVVVVVVVVSSSVVVVVVM
-MVVVVVVVVVSSVVVVVVVM
-MSVVVVVVVVSVVVSSVVSM
-PJVVVVVVSSSSSSVVVVOP
-MSVVVVVVVVSVVVSSVVSM
-MVVVVVVVVVSVVVVVVVVM
-MVVVVVVVVVSSVVVVVVVM
-MVVVVVVVVVSSSVVVVVVM
+MVVLMVVVVVVVMVVVVVVM
+MJVVPVVVVVVVPVVVVVVM
+MVVVMVVVVVVLMVVVVVVM
+MMMMMMMMMMMMMVVVVVOP
+MVVVMVVVVLVVMVVVVVVM
+MJVVMVVVVVVVMLVVVVVM
+MVVVPVVVVVVVMVVVVVVM
+MVVLMVVVVVVVPVVVVVVM
 MMMMMMMMMMMMMMMMMMMM
+
+Indices :
+00000000000000000000
+00010000000000000000
+00005000000030000000
+00000000000200000000
+00000000000000000004
+00000000030000000000
+00000000000004000000
+00001000000000000000
+00050000000020000000
+00000000000000000000
+
+Couleurs :
+AAAAAAAAAAAAAAAAAAAA
+AAARAAAAAAAAAAAAAAAA
+AAAAVAAAAAAAVAAAAAAA
+AAAAAAAAAAARAAAAAAAA
+AAAAAAAAAAAAAAAAAAAB
+AAAAAAAAAVAAAAAAAAAA
+AAAAAAAAAAAAABAAAAAA
+AAAARAAAAAAAAAAAAAAA
+AAAVAAAAAAAARAAAAAAA
+AAAAAAAAAAAAAAAAAAAA
  */
 
 /* Ce a quoi ressemble une salle Labyrinthe
@@ -283,15 +374,15 @@ MVVVVVVVVMVOVVVVVVOP
 MMMMMMMMMMMMMMMMMMMM
  */
 
-/* Ce a quoi ressemble une salle aux trésors
-MMMMMMMMMMMMMMMMMMMM
-MMMMMMMMMSVVVVVVVTMM
-MMMMMMMMSVVVVVVVTTTM
-MSVVVVVVVVVVVVTTTTTM
-PJVVVVVVVVVVVVTTTTTM
-MSVVVVVVVVVVVVTTTTTM
-MMMMMMMMSVVVVVVTTTTM
-MMMMMMMMMSVVVVVVVTMM
-MMMMMMMMMMMMMMMMMMMM
-MMMMMMMMMMMMMMMMMMMM
+/* Ce a quoi ressemble une salle aux trésors (sortie)
+MVVVVVVVVVVVVVVVVVVV
+MVVVVVVVVVVVVVVVVVVV
+MVVVVVVVVVVVVVVVVVVV
+MVVVVVVVVVVVVVVVVVVV
+PJVVVVVVVVVVVVVVVVVV
+MVVVVVVVVVVVVVVVVVVV
+MVVVVVVVVVVVVVVVVVVV
+MVVVVVVVVVVVVVVVVVVV
+MVVVVVVVVVVVVVVVVVVV
+MVVVVVVVVVVVVVVVVVVV
  */

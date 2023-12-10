@@ -45,7 +45,7 @@ public class Jeu extends Observable implements Runnable {
      * Constructeur de Jeu
      */
     public Jeu() {
-        heros = new Heros(this, 0, 0);
+        heros = new Heros(this, 0, 0, 'B');
         tour = new CompteurGlobale(NB_TOUR);
         tabCasePiegeMobile = new CasePiegeMobile[MAX_PIEGE_MOBILE];
         compteurPiegeMobile = 0;
@@ -196,7 +196,7 @@ public class Jeu extends Observable implements Runnable {
         addEntiteStatique(new CaseNormale(this), 6, 7);
         addEntiteStatique(new CaseNormale(this), 5, 8);
 
-        addEntiteStatique(new Levier(this),8,5);
+        addEntiteStatique(new Levier(this, 1, 'B'),8,5);
         addEntiteStatique(new CaseNormale(this),4,7);
         addEntiteStatique(new CaseNormale(this),2,3);
         addEntiteStatique(new CaseNormale(this),2,2);
@@ -205,7 +205,7 @@ public class Jeu extends Observable implements Runnable {
         addEntiteStatique(new CaseNormale(this),7,6);
         addEntiteStatique(new CaseNormale(this),4,8);
 
-        addEntiteStatique(new Porte(this), 19, 5);
+        addEntiteStatique(new Porte(this, 1, 'B', true), 19, 5);
 
         initialisationDesPickUp();
     }

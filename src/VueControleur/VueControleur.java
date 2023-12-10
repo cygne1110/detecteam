@@ -34,8 +34,12 @@ public class VueControleur extends JFrame implements Observer {
     private ImageIcon icoMur;
     private ImageIcon icoCaseUniqueUtilise;
     private ImageIcon icoCaseUnique;
-    private ImageIcon icoPorte;
-    private ImageIcon icoPorteOuverte;
+    private ImageIcon icoPorteBleueFermee;
+    private ImageIcon icoPorteBleueOuverte;
+    private ImageIcon icoPorteVerteOuverte;
+    private ImageIcon icoPorteVerteFermee;
+    private ImageIcon icoPorteRougeOuverte;
+    private ImageIcon icoPorteRougeFermee;
     private ImageIcon icoCapsuleEau;
     private ImageIcon icoCle;
     private ImageIcon icoCoffre;
@@ -47,6 +51,8 @@ public class VueControleur extends JFrame implements Observer {
     private ImageIcon icoAntiPoison;
 
     //ImageIcon des leviers
+    private ImageIcon icoLevierBleuActive;
+    private ImageIcon icoLevierBleuDesactive;
     private ImageIcon icoLevierRougeActive;
     private ImageIcon icoLevierRougeDesactive;
     private ImageIcon icoLevierVertActive;
@@ -137,13 +143,24 @@ public class VueControleur extends JFrame implements Observer {
      * Charge toutes les icônes
      */
     private void chargerLesIcones() {
-        icoHero = chargerIcone("Images/agent_vert_est.png");
+        if(jeu.getHeros().getCouleur() == 'V') {
+            icoHero = chargerIcone("Images/agent_vert_est.png");
+        }else{
+            icoHero = chargerIcone("Images/agent_rouge_est.png");
+        }
         icoCaseNormale = chargerIcone("Images/Sol.png");
         icoMur = chargerIcone("Images/Mur.png");
         icoCaseUnique = chargerIcone("Images/Piege_de_feu.png");
         icoCaseUniqueUtilise = chargerIcone("Images/Feu.png");
-        icoPorte = chargerIcone("Images/porte_fermee.png");
-        icoPorteOuverte = chargerIcone("Images/porte_ouverte.png");
+
+        //Icones des portes
+        icoPorteBleueOuverte = chargerIcone("Images/porte_bleue_ouverte.png");
+        icoPorteBleueFermee = chargerIcone("Images/porte_bleue_fermee.png");
+        icoPorteVerteOuverte = chargerIcone("Images/porte_verte_ouverte.png");
+        icoPorteVerteFermee = chargerIcone("Images/porte_verte_fermee.png");
+        icoPorteRougeOuverte = chargerIcone("Images/porte_rouge_ouverte.png");
+        icoPorteRougeFermee = chargerIcone("Images/porte_rouge_fermee.png");
+
         icoCapsuleEau = chargerIcone("Images/Capsule_eau.png");
         icoCle = chargerIcone("Images/Cle.png");
         icoCoffre = chargerIcone("Images/Coffre.png");
@@ -155,6 +172,8 @@ public class VueControleur extends JFrame implements Observer {
         icoAntiPoison = chargerIcone("Images/Potion_Anti_Poison.png");
 
         //Icones des leviers
+        icoLevierBleuActive = chargerIcone("Images/levier_bleu_active.png");
+        icoLevierBleuDesactive = chargerIcone("Images/levier_bleu_desactive.png");
         icoLevierRougeActive = chargerIcone("Images/levier_rouge_active.png");
         icoLevierRougeDesactive = chargerIcone("Images/levier_rouge_desactive.png");
         icoLevierVertActive = chargerIcone("Images/levier_vert_active.png");
@@ -169,16 +188,32 @@ public class VueControleur extends JFrame implements Observer {
         char orientation = jeu.getHeros().getOrientation();
         switch (orientation){
             case 'E':
-                icoHero = chargerIcone("Images/agent_vert_est.png");
+                if(jeu.getHeros().getCouleur() == 'V') {
+                    icoHero = chargerIcone("Images/agent_vert_est.png");
+                }else{
+                    icoHero = chargerIcone("Images/agent_rouge_est.png");
+                }
                 break;
             case 'O':
-                icoHero = chargerIcone("Images/agent_vert_ouest.png");
+                if(jeu.getHeros().getCouleur() == 'V') {
+                    icoHero = chargerIcone("Images/agent_vert_ouest.png");
+                }else{
+                    icoHero = chargerIcone("Images/agent_rouge_ouest.png");
+                }
                 break;
             case 'N':
-                icoHero = chargerIcone("Images/agent_vert_nord.png");
+                if(jeu.getHeros().getCouleur() == 'V') {
+                    icoHero = chargerIcone("Images/agent_vert_nord.png");
+                }else{
+                    icoHero = chargerIcone("Images/agent_rouge_nord.png");
+                }
                 break;
             case 'S':
-                icoHero = chargerIcone("Images/agent_vert_sud.png");
+                if(jeu.getHeros().getCouleur() == 'V') {
+                    icoHero = chargerIcone("Images/agent_vert_sud.png");
+                }else{
+                    icoHero = chargerIcone("Images/agent_rouge_sud.png");
+                }
                 break;
             default:
                 break;
@@ -368,18 +403,50 @@ public class VueControleur extends JFrame implements Observer {
                 }
                 else if(e instanceof Porte) { // Porte
                     if(((Porte) e).getOuverte()){
-                        tabJLabel[x][y].setIcon(icoPorteOuverte);
+                        if((((Porte) e).getCouleur()) == 'R') {
+                            tabJLabel[x][y].setIcon(icoPorteRougeOuverte);
+                        }
+                        if((((Porte) e).getCouleur()) == 'V') {
+                            tabJLabel[x][y].setIcon(icoPorteVerteOuverte);
+                        }
+                        if((((Porte) e).getCouleur()) == 'B') {
+                            tabJLabel[x][y].setIcon(icoPorteBleueOuverte);
+                        }
                     }
                     else{
-                        tabJLabel[x][y].setIcon(icoPorte);
+                        if((((Porte) e).getCouleur()) == 'R') {
+                            tabJLabel[x][y].setIcon(icoPorteRougeFermee);
+                        }
+                        if((((Porte) e).getCouleur()) == 'V') {
+                            tabJLabel[x][y].setIcon(icoPorteVerteFermee);
+                        }
+                        if((((Porte) e).getCouleur()) == 'B') {
+                            tabJLabel[x][y].setIcon(icoPorteBleueFermee);
+                        }
                     }
                 }
                 else if(e instanceof Levier) { //Levier
                     if(((Levier) e).getActive()){
-                        tabJLabel[x][y].setIcon(icoLevierRougeActive);
+                        if((((Levier) e).getCouleur()) == 'R'){
+                            tabJLabel[x][y].setIcon(icoLevierRougeActive);
+                        }
+                        if((((Levier) e).getCouleur()) == 'V'){
+                            tabJLabel[x][y].setIcon(icoLevierVertActive);
+                        }
+                        if((((Levier) e).getCouleur()) == 'B'){
+                            tabJLabel[x][y].setIcon(icoLevierBleuActive);
+                        }
                     }
                     else{
-                        tabJLabel[x][y].setIcon(icoLevierRougeDesactive);
+                        if((((Levier) e).getCouleur()) == 'R'){
+                            tabJLabel[x][y].setIcon(icoLevierRougeDesactive);
+                        }
+                        if((((Levier) e).getCouleur()) == 'V'){
+                            tabJLabel[x][y].setIcon(icoLevierVertDesactive);
+                        }
+                        if((((Levier) e).getCouleur()) == 'B'){
+                            tabJLabel[x][y].setIcon(icoLevierBleuDesactive);
+                        }
                     }
                 }
             }
