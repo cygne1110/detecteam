@@ -15,4 +15,8 @@ public class Coord2D {
         heuristique = Math.abs(dep.x - dest.x + dep.y - dest.y);
     }
 
+    public boolean equals(Coord2D other) {
+        return (x == other.x && y == other.y);
+    }
+
 }

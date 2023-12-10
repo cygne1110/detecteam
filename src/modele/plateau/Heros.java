@@ -6,10 +6,7 @@
 package modele.plateau;
 
 import java.awt.*;
-import java.util.Comparator;
-import java.util.LinkedList;
-import java.util.PriorityQueue;
-import java.util.Queue;
+import java.util.*;
 
 /**
  * Héros du jeu
@@ -25,8 +22,22 @@ public class Heros {
     private char typeStatut; // Le type de malus ou bonus reçu ('P' empoisonnement,...)
     private ActionHero action; // Les actions que le héro peut faire
     private Deplacement deplacerHero; // Les déplacement que le héro peut faire
+    private int state = 0; // Etat de l'agent
+    /*
+    *  0 -> état d'exploration sans but
+    *  1 -> état d'exploration avec but
+    *  2 -> état de déplacement où le robot connait le chemin (pas trouvé de meilleur nom)
+    */
+
+    private int objective = -1; // Objectif (-1 = Rien, 0 = Porte, 1 = Levier)
+    private int objectiveID = -1; // Indice de l'objectif
+    public boolean explored[][] = new boolean[20][10]; // Cases connues du héro
+    // -> Communication entre les agents (OU des maps)
+    private EntiteStatique grid[][];
 
     private char couleur;
+    private int indice;
+    private Coord2D destination;
 
     private Jeu jeu;
 
@@ -53,6 +64,13 @@ public class Heros {
         action = new ActionHero(this);
         deplacerHero = new Deplacement(this);
         couleur = _couleur;
+        grid = jeu.getGrilleEntitesStatiques();
+        for(int i = 0; i < jeu.SIZE_X; i++) {
+            for(int j = 0; j < jeu.SIZE_Y; j++) {
+                explored[i][j] = false;
+            }
+        }
+        explored[x][y] = true;
     }
 
 
@@ -128,8 +146,6 @@ public class Heros {
 
     public void setOrientation(char orientation) { this.orientation = orientation; }
 
-
-
     ///////////////////////////////////////////////////////////////////////////
     //Fonctions Case
     ///////////////////////////////////////////////////////////////////////////
@@ -189,7 +205,7 @@ public class Heros {
         if(jeu.getEntite(x, y) instanceof Porte){
             EntiteStatique e = jeu.getEntite(x, y);
             if(((Porte) e).getFinale()) {
-                jeu.getSalle().salleAleatoire(jeu.getHeros()); //On appelle la méthode qui créer les salles aléatoirement
+                //jeu.getSalle().salleAleatoire(jeu.getHeros()); //On appelle la méthode qui créer les salles aléatoirement
                 resetHeroSalle();
             }
         }
@@ -246,158 +262,260 @@ public class Heros {
         }
     }
 
-    /*
-    public Coord2D checkPath(int dest_x, int dest_y) {
-        int delta;
-        Coord2D lastStep = new Coord2D(0, 0);
-        EntiteStatique grid[][] = jeu.getGrilleEntitesStatiques();
-        if(dest_x == x) {
-            lastStep.x = x;
-            lastStep.y = y;
-            delta = dest_y - y;
-            if (delta < 0) {
-                for (int i = 0; i > delta; i--) {
-                    if (!(grid[x][y - i - 1].traversable()) || grid[x][y - i] instanceof Levier) return lastStep;
-                    lastStep.y = y - i;
-                }
-                return lastStep;
-            } else {
-                for (int i = 0; i <= delta; i++) {
-                    if (!(grid[x][y + i + 1].traversable()) || grid[x][y + i] instanceof Levier) return lastStep;
-                    lastStep.y = y + i;
-                }
-                return lastStep;
-            }
-        } else if(dest_y == y) {
-            lastStep.x = x;
-            lastStep.y = y;
-            delta = dest_x - x;
-            if(delta < 0) {
-                for (int i = 0; i > delta; i--) {
-                    if (!(grid[x - i - 1][y].traversable()) || grid[x - i][y] instanceof Levier) return lastStep;
-                    lastStep.x = x - i;
-                }
-                return lastStep;
-            } else {
-                for(int i = 0; i < delta; i++) {
-                    if (!(grid[x + i + 1][y].traversable()) || grid[x + i][y] instanceof Levier) return lastStep;
-                    lastStep.x = x + i;
-                }
-                return lastStep;
-            }
-        } else {
-            return null;
-        }
-    }
-
-    public char pathFind(int dest_x, int dest_y) {
-        Coord2D tmpPos;
-        tmpPos = checkPath(x, y);
-        if(tmpPos == null) {
-            System.out.println("checkPath returned null");
-            return (char)0;
-        }
-        System.out.println(tmpPos.x + " " + tmpPos.y);
-        Coord2D delta = new Coord2D(tmpPos.x - x, tmpPos.y - y);
-        System.out.println(delta.x + " " + delta.y);
-        if(delta.x == 0 && delta.y != 0) {
-            if(delta.y < 0) return 'B';
-            else return 'H';
-        } else if(delta.y == 0) {
-            if(delta.x < 0) return 'G';
-            else return 'D';
-        } else return pathFind(x, dest_y);
-    }
-
-    public void moveTo(int dest_x, int dest_y) {
-        EntiteStatique grid[][] = jeu.getGrilleEntitesStatiques();
-        if(!(grid[dest_x][dest_y].traversable())) {
-            System.out.println("moveTo: you're trying to go to an inaccessible case");
-            return;
-        }
-        char dest = pathFind(dest_x, dest_y);
-        switch(dest) {
-            case 'H':
-                deplacerHero.haut();
-                break;
-            case 'B':
-                deplacerHero.bas();
-                break;
-            case 'D':
-                deplacerHero.droite();
-                break;
-            case 'G':
-                deplacerHero.gauche();
-                break;
-            default:
-                System.out.println("pathFind returned 0");
-                return;
-        }
-    }
-    */
     private Queue<Coord2D> fetchVoisins(Coord2D node) {
         Queue<Coord2D> res = new LinkedList<Coord2D>();
-        if(node.x - 1 > 0) res.add(new Coord2D(node.x - 1, node.y));
-        if(node.x + 1 < jeu.SIZE_X) res.add(new Coord2D(node.x + 1, node.y));
-        if(node.y - 1 > 0) res.add(new Coord2D(node.x, node.y - 1));
-        if(node.y + 1 < jeu.SIZE_Y) res.add(new Coord2D(node.x, node.y + 1));
+        if(node.x - 1 > 0) {
+            if(grid[node.x-1][node.y].traversable() && !(grid[node.x-1][node.y] instanceof Levier)) {
+                res.add(new Coord2D(node.x - 1, node.y));
+            }
+        }
+        if(node.x + 1 < jeu.SIZE_X) {
+            if(grid[node.x+1][node.y].traversable() && !(grid[node.x+1][node.y] instanceof Levier)) {
+                res.add(new Coord2D(node.x + 1, node.y));
+            }
+        }
+        if(node.y - 1 > 0) {
+            if(grid[node.x][node.y-1].traversable() && !(grid[node.x][node.y-1] instanceof Levier)) {
+                res.add(new Coord2D(node.x, node.y - 1));
+            }
+        }
+        if(node.y + 1 < jeu.SIZE_Y) {
+            if(grid[node.x][node.y+1].traversable() && !(grid[node.x][node.y+1] instanceof Levier)) {
+                res.add(new Coord2D(node.x, node.y + 1));
+            }
+        }
         return res;
     }
 
     private boolean containsLess(Queue<Coord2D> queue, Coord2D elt) {
-        if(!queue.contains(elt)) return false;
+        if(contains(queue, elt)) return false;
         Queue<Coord2D> copy = new LinkedList<Coord2D>(queue);
         while(!copy.isEmpty()) {
             Coord2D e = copy.remove();
-            if(e.x == elt.x && e.y == elt.y && e.cout <= elt.cout) return true;
+            if(elt.equals(e) && e.cout < elt.cout) return true;
         }
         return false;
     }
 
+    private boolean contains(Queue<Coord2D> queue, Coord2D elt) {
+        Queue<Coord2D> copy = new LinkedList<Coord2D>(queue);
+        while(!copy.isEmpty()) {
+            Coord2D e = copy.remove();
+            if(elt.equals(e)) return true;
+        }
+        return false;
+    }
+
+    private Queue<Coord2D> reconstructPath(Map<Coord2D, Coord2D> cameFrom, Coord2D dest) {
+        Stack<Coord2D> tmp = new Stack<Coord2D>();
+        Coord2D curr = dest;
+        tmp.push(curr);
+        while(cameFrom.containsKey(curr)) {
+            curr = cameFrom.get(curr);
+            tmp.push(curr);
+        }
+        Queue<Coord2D> path = new LinkedList<Coord2D>();
+        while(!tmp.isEmpty()) {
+            path.add(tmp.pop());
+        }
+        path.remove();
+        return path;
+    }
+
+    private void printQueue(Queue<Coord2D> queue) {
+        Queue<Coord2D> copy = new LinkedList<Coord2D>(queue);
+        while(!copy.isEmpty()) {
+            Coord2D print = copy.remove();
+            System.out.println(print.x + " " + print.y);
+        }
+    }
+
     public Queue<Coord2D> pathFind(Coord2D dest) {
-        EntiteStatique grid[][] = jeu.getGrilleEntitesStatiques();
         Comparator<Coord2D> comparator = new Coord2DComparator();
         PriorityQueue<Coord2D> openList = new PriorityQueue<Coord2D>(comparator);
         Queue<Coord2D> closedList = new LinkedList<Coord2D>();
+        Map<Coord2D, Coord2D> cameFrom = new HashMap<Coord2D, Coord2D>();
         Coord2D start = new Coord2D(x, y, 0, 0);
         assert(grid[dest.x][dest.y].traversable());
 
         openList.add(start);
         while(!openList.isEmpty()) {
             Coord2D tmp = openList.remove();
-            System.out.println(tmp.x + " " + tmp.y);
-            if(tmp.x == dest.x && tmp.y == dest.y) {
-                return closedList;
+            closedList.add(tmp);
+            if(tmp.equals(dest)) {
+                return reconstructPath(cameFrom, tmp);
             }
             Queue<Coord2D> voisins = fetchVoisins(tmp);
             for(Coord2D v: voisins) {
-                if(grid[v.x][v.y].traversable() && !(grid[v.x][v.y] instanceof Levier) && !(closedList.contains(v) || containsLess(openList, v))) {
-                    v.cout = tmp.cout + 1;
-                    v.manhattanDistance(v, dest);
-                    v.heuristique += v.cout;
-                    openList.add(v);
+                if (contains(closedList, v) || containsLess(openList, v)) {
+                    continue;
                 }
+                v.cout = tmp.cout + 1;
+                v.manhattanDistance(v, dest);
+                v.heuristique += v.cout;
+                cameFrom.put(v, tmp);
+                openList.add(v);
             }
-            closedList.add(tmp);
         }
         System.out.println("pathFind did not find a path");
         return null;
 
     }
 
-    public void moveTo(Coord2D dest) {
-        EntiteStatique grid[][] = jeu.getGrilleEntitesStatiques();
-        assert(grid[dest.x][dest.y].traversable());
+    public boolean moveTo(Coord2D dest) {
+        // assert(grid[dest.x][dest.y].traversable());
         Coord2D delta = new Coord2D(dest.x - x, dest.y - y);
+        System.out.println(delta.x + " " + delta.y);
         if(delta.x == 0 && delta.y != 0) {
-            if(y < 0) deplacerHero.haut();
-            else deplacerHero.bas();
+            if(delta.y < 0) {
+                deplacerHero.haut();
+                return true;
+            } else {
+                deplacerHero.bas();
+                return true;
+            }
         } else if(delta.y == 0) {
-            if(x < 0) deplacerHero.gauche();
-            else deplacerHero.droite();
+            if(delta.x < 0) {
+                deplacerHero.gauche();
+                return true;
+            } else {
+                deplacerHero.droite();
+                return true;
+            }
         } else {
-            System.out.println("Can't move here");
+            return false;
         }
+    }
+
+    public int checkClear(Coord2D target) {
+        return jeu.checkClear(target);
+    }
+
+    public void communicate(int index) {
+        for(int i = 0; i < 20; i++) {
+            for(int j = 0; j < 10; j++) {
+                explored[i][j] = explored[i][j] || jeu.getHeros(index).explored[i][j];
+                jeu.getHeros(index).explored[i][j] = explored[i][j] || jeu.getHeros(index).explored[i][j];
+            }
+        }
+    }
+
+    private boolean info(Coord2D target) {
+        if(grid[target.x][target.y] instanceof Levier || grid[target.x][target.y] instanceof Porte)
+            return true;
+        int i = checkClear(target);
+        if(i != -1) {
+            communicate(i);
+        }
+        return false;
+    }
+
+    private void action(Coord2D target) {
+        if(state == 0) {
+            if (grid[target.x][target.y] instanceof Porte) {
+                if (((Porte) grid[target.x][target.y]).getCouleur() == couleur && !((Porte) grid[target.x][target.y]).getOuverte()) {
+                    state = 1;
+                    objective = 1;
+                    objectiveID = ((Porte) grid[target.x][target.y]).getIndice();
+                }
+            } else if (grid[target.x][target.y] instanceof Levier) {
+                if (((Levier) grid[target.x][target.y]).getCouleur() == couleur && !((Levier) grid[target.x][target.y]).getActive()) {
+                    state = 2;
+                    destination = target;
+                }
+            }
+        } else if(state == 1) {
+            if(grid[target.x][target.y] instanceof Levier && objective == 1) {
+                if (((Levier) grid[target.x][target.y]).getIndice() == objectiveID && ((Levier) grid[target.x][target.y]).getCouleur() == couleur && !((Levier) grid[target.x][target.y]).getActive()) {
+                    state = 2;
+                    destination = target;
+                }
+            } else if(grid[target.x][target.y] instanceof Porte && objective == 0) {
+                if (((Porte) grid[target.x][target.y]).getIndice() == objectiveID && ((Porte) grid[target.x][target.y]).getCouleur() == couleur && ((Porte) grid[target.x][target.y]).getOuverte()) {
+                    state = 2;
+                    destination = target;
+                }
+            }
+
+        }
+    }
+
+    private void discover() {
+        if(x - 1 > 0) {
+            explored[x-1][y] = true;
+            Coord2D target = new Coord2D(x-1, y);
+            if(info(target)) {
+                action(target);
+            }
+        }
+        if(x + 1 < jeu.SIZE_X) {
+            explored[x+1][y] = true;
+            Coord2D target = new Coord2D(x+1, y);
+            if(info(target)) {
+                action(target);
+            }
+        }
+        if(y - 1 > 0) {
+            explored[x][y-1] = true;
+            Coord2D target = new Coord2D(x, y-1);
+            if(info(target)) {
+                action(target);
+            }
+        }
+        if(y + 1 < jeu.SIZE_Y) {
+            explored[x][y+1] = true;
+            Coord2D target = new Coord2D(x, y+1);
+            if(info(target)) {
+                action(target);
+            }
+        }
+    }
+
+    public void explore() {
+        Random rand = new Random();
+        boolean moved = false;
+        while(!moved) {
+            int choice = rand.nextInt(0, 4);
+            System.out.println(choice);
+            switch(choice) {
+                case 0:
+                    if(x - 1 > 0 && checkClear(new Coord2D(x - 1, y)) == -1) {
+                        moved = moveTo(new Coord2D(x - 1, y));
+                    }
+                    break;
+                case 1:
+                    if(x + 1 < jeu.SIZE_X && checkClear(new Coord2D(x + 1, y)) == -1) {
+                        moved = moveTo(new Coord2D(x + 1, y));
+                    }
+                    break;
+                case 2:
+                    if(y - 1 > 0 && checkClear(new Coord2D(x, y-1)) == -1) {
+                        moved = moveTo(new Coord2D(x, y - 1));
+                    }
+                    break;
+                case 3:
+                    if(y + 1 < jeu.SIZE_Y && checkClear(new Coord2D(x, y+1)) == -1) {
+                        moved = moveTo(new Coord2D(x, y + 1));
+                    }
+                    break;
+            }
+        }
+    }
+
+    public void run() {
+        discover();
+        System.out.println("run:" + indice + " " + state);
+        System.out.println("A");
+        if(state == 0) {
+            System.out.println("C");
+            explore();
+        } else if(state == 1) {
+            explore();
+        } else if(state == 2) {
+            Queue<Coord2D> path = pathFind(destination);
+            moveTo(path.remove());
+        }
+        System.out.println("B");
     }
 
 }

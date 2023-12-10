@@ -95,35 +95,35 @@ public class VueControleur extends JFrame implements Observer {
                     case KeyEvent.VK_LEFT -> {
                         jeu.getTour().incr();
                         jeu.actPiegeMobile();
-                        jeu.getHeros().getDeplacerHero().gauche();
+                        //jeu.getHeros().getDeplacerHero().gauche();
                     }
                     case KeyEvent.VK_RIGHT -> {
                         jeu.getTour().incr();
                         jeu.actPiegeMobile();
-                        jeu.getHeros().getDeplacerHero().droite();
+                        //jeu.getHeros().getDeplacerHero().droite();
                     }
                     case KeyEvent.VK_DOWN -> {
                         jeu.getTour().incr();
                         jeu.actPiegeMobile();
-                        jeu.getHeros().getDeplacerHero().bas();
+                        //jeu.getHeros().getDeplacerHero().bas();
                     }
                     case KeyEvent.VK_UP -> {
                         jeu.getTour().incr();
                         jeu.actPiegeMobile();
-                        jeu.getHeros().getDeplacerHero().haut();
+                        //jeu.getHeros().getDeplacerHero().haut();
                     }
                     case KeyEvent.VK_C -> {
                         jeu.getTour().incr();
                         jeu.actPiegeMobile();
-                        jeu.getHeros().getAction().lancerCapsule();
+                        //jeu.getHeros().getAction().lancerCapsule();
                     }
                     case KeyEvent.VK_O -> {
                         jeu.getTour().incr();
                         jeu.actPiegeMobile();
-                        jeu.getHeros().getAction().ouvrirPorte();
+                        //jeu.getHeros().getAction().ouvrirPorte();
                     }
                     case KeyEvent.VK_SPACE ->{
-                        jeu.getHeros().getAction().sauter();
+                        //jeu.getHeros().getAction().sauter();
                     }
                     case KeyEvent.VK_R ->{
                         jeu.restart();
@@ -143,10 +143,12 @@ public class VueControleur extends JFrame implements Observer {
      * Charge toutes les icônes
      */
     private void chargerLesIcones() {
-        if(jeu.getHeros().getCouleur() == 'V') {
-            icoHero = chargerIcone("Images/agent_vert_est.png");
-        }else{
-            icoHero = chargerIcone("Images/agent_rouge_est.png");
+        for(int i = 0; i < 4; i++) {
+            if (jeu.getHeros(i).getCouleur() == 'V') {
+                icoHero = chargerIcone("Images/agent_vert_est.png");
+            } else {
+                icoHero = chargerIcone("Images/agent_rouge_est.png");
+            }
         }
         icoCaseNormale = chargerIcone("Images/Sol.png");
         icoMur = chargerIcone("Images/Mur.png");
@@ -185,38 +187,40 @@ public class VueControleur extends JFrame implements Observer {
      * Charge l'image du héro en fonction de son orientation
      */
     private void chargerHero(){
-        char orientation = jeu.getHeros().getOrientation();
-        switch (orientation){
-            case 'E':
-                if(jeu.getHeros().getCouleur() == 'V') {
-                    icoHero = chargerIcone("Images/agent_vert_est.png");
-                }else{
-                    icoHero = chargerIcone("Images/agent_rouge_est.png");
-                }
-                break;
-            case 'O':
-                if(jeu.getHeros().getCouleur() == 'V') {
-                    icoHero = chargerIcone("Images/agent_vert_ouest.png");
-                }else{
-                    icoHero = chargerIcone("Images/agent_rouge_ouest.png");
-                }
-                break;
-            case 'N':
-                if(jeu.getHeros().getCouleur() == 'V') {
-                    icoHero = chargerIcone("Images/agent_vert_nord.png");
-                }else{
-                    icoHero = chargerIcone("Images/agent_rouge_nord.png");
-                }
-                break;
-            case 'S':
-                if(jeu.getHeros().getCouleur() == 'V') {
-                    icoHero = chargerIcone("Images/agent_vert_sud.png");
-                }else{
-                    icoHero = chargerIcone("Images/agent_rouge_sud.png");
-                }
-                break;
-            default:
-                break;
+        for(int i = 0; i < 4; i++) {
+            char orientation = jeu.getHeros(i).getOrientation();
+            switch (orientation) {
+                case 'E':
+                    if (jeu.getHeros(i).getCouleur() == 'V') {
+                        icoHero = chargerIcone("Images/agent_vert_est.png");
+                    } else {
+                        icoHero = chargerIcone("Images/agent_rouge_est.png");
+                    }
+                    break;
+                case 'O':
+                    if (jeu.getHeros(i).getCouleur() == 'V') {
+                        icoHero = chargerIcone("Images/agent_vert_ouest.png");
+                    } else {
+                        icoHero = chargerIcone("Images/agent_rouge_ouest.png");
+                    }
+                    break;
+                case 'N':
+                    if (jeu.getHeros(i).getCouleur() == 'V') {
+                        icoHero = chargerIcone("Images/agent_vert_nord.png");
+                    } else {
+                        icoHero = chargerIcone("Images/agent_rouge_nord.png");
+                    }
+                    break;
+                case 'S':
+                    if (jeu.getHeros(i).getCouleur() == 'V') {
+                        icoHero = chargerIcone("Images/agent_vert_sud.png");
+                    } else {
+                        icoHero = chargerIcone("Images/agent_rouge_sud.png");
+                    }
+                    break;
+                default:
+                    break;
+            }
         }
     }
 
@@ -287,23 +291,23 @@ public class VueControleur extends JFrame implements Observer {
         vie.setIcon(icoVie);
 
         // On créer les conteneurs pour les textes
-        nbCapsule = new JLabel("Nombre de capsule eau : "+jeu.getHeros().getSac_a_dos().getNbCapsuleEau());
-        nbCle = new JLabel("Nombre de clé : "+jeu.getHeros().getSac_a_dos().getNbCle());
-        nbVie = new JLabel("Vie : "+jeu.getHeros().getNbVie());
-        etat = new JLabel("Etat du joueur : "+jeu.getHeros().getTypeStatut());
+        //nbCapsule = new JLabel("Nombre de capsule eau : "+jeu.getHeros().getSac_a_dos().getNbCapsuleEau());
+        //nbCle = new JLabel("Nombre de clé : "+jeu.getHeros().getSac_a_dos().getNbCle());
+        //nbVie = new JLabel("Vie : "+jeu.getHeros().getNbVie());
+        //etat = new JLabel("Etat du joueur : "+jeu.getHeros().getTypeStatut());
 
 
         //On assemble tous les conteneurs
         conteneurCle.add(cle);
-        conteneurCle.add(nbCle);
+        //conteneurCle.add(nbCle);
 
         conteneurCapsule.add(capsule);
-        conteneurCapsule.add(nbCapsule);
+        //conteneurCapsule.add(nbCapsule);
 
         conteneurVie.add(vie);
-        conteneurVie.add(nbVie);
+        //conteneurVie.add(nbVie);
 
-        conteneurEtat.add(etat);
+        // conteneurEtat.add(etat);
 
         conteneurCleEtVie.add(BorderLayout.WEST,conteneurCle);
         conteneurCleEtVie.add(BorderLayout.EAST,conteneurVie);
@@ -324,11 +328,13 @@ public class VueControleur extends JFrame implements Observer {
      */
     void mettreAJourHero(){
         chargerHero(); // Met à jour l'image du héro en fonction de son orientation
-        tabJLabel[jeu.getHeros().getX()][jeu.getHeros().getY()].setIcon(icoHero);
-        nbCapsule.setText("Nombre de capsule eau : "+jeu.getHeros().getSac_a_dos().getNbCapsuleEau()); // Met à jour son nombre de capsule d'eau
-        nbCle.setText("Nombre de clé : "+jeu.getHeros().getSac_a_dos().getNbCle()); // Met à jour son nombre de clé
-        nbVie.setText("Vie : "+jeu.getHeros().getNbVie()); // Met à jour son nombre de vie
-        etat.setText("Etat du héro  : "+jeu.getHeros().getTypeStatut());
+        for(int i = 0; i < 4; i++) {
+            tabJLabel[jeu.getHeros(i).getX()][jeu.getHeros(i).getY()].setIcon(icoHero);
+        }
+        //nbCapsule.setText("Nombre de capsule eau : "+jeu.getHeros().getSac_a_dos().getNbCapsuleEau()); // Met à jour son nombre de capsule d'eau
+        //nbCle.setText("Nombre de clé : "+jeu.getHeros().getSac_a_dos().getNbCle()); // Met à jour son nombre de clé
+        //nbVie.setText("Vie : "+jeu.getHeros().getNbVie()); // Met à jour son nombre de vie
+        //etat.setText("Etat du héro  : "+jeu.getHeros().getTypeStatut());
     }
 
 

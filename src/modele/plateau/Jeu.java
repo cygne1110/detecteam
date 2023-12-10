@@ -7,6 +7,7 @@ package modele.plateau;
 
 import Util.Outils;
 
+import java.util.LinkedList;
 import java.util.Observable;
 import java.util.Queue;
 
@@ -25,7 +26,7 @@ public class Jeu extends Observable implements Runnable {
 
     private final int pause = 200; // période de rafraichissement
 
-    private Heros heros; // Le héros du jeu
+    private Heros heros[] = new Heros[4]; // Le héros du jeu
     private Salle salle; // La salle dans laquel est le héro
 
     protected EntiteStatique[][] grilleEntitesStatiques = new EntiteStatique[SIZE_X][SIZE_Y];
@@ -46,7 +47,10 @@ public class Jeu extends Observable implements Runnable {
      * Constructeur de Jeu
      */
     public Jeu() {
-        heros = new Heros(this, 0, 0, 'B');
+        heros[0] = new Heros(this, 0, 0, 'V');
+        heros[1] = new Heros(this, 0, 1, 'V');
+        heros[2] = new Heros(this, 1, 0, 'R');
+        heros[3] = new Heros(this, 1, 1, 'R');
         tour = new CompteurGlobale(NB_TOUR);
         tabCasePiegeMobile = new CasePiegeMobile[MAX_PIEGE_MOBILE];
         compteurPiegeMobile = 0;
@@ -63,8 +67,8 @@ public class Jeu extends Observable implements Runnable {
     public Salle getSalle(){return salle;}
 
 
-    public Heros getHeros() {
-        return heros;
+    public Heros getHeros(int index) {
+        return heros[index];
     }
 
 
@@ -176,7 +180,10 @@ public class Jeu extends Observable implements Runnable {
      * Ajoute des Entités statiques au terrain (piéges,mur,caseUnique,caseNormale,...)
      */
     private void initialisationDesEntites() {
-        heros.setX(4);heros.setY(4);
+        heros[0].setX(4);heros[0].setY(4);
+        heros[1].setX(4);heros[1].setY(5);
+        heros[2].setX(5);heros[2].setY(4);
+        heros[3].setX(5);heros[3].setY(5);
 
 
         // murs extérieurs horizontaux
@@ -193,6 +200,11 @@ public class Jeu extends Observable implements Runnable {
 
         addEntiteStatique(new Mur(this), 5, 1);
         addEntiteStatique(new Mur(this), 5, 2);
+        addEntiteStatique(new Mur(this), 9, 6);
+        addEntiteStatique(new Mur(this), 9, 7);
+        addEntiteStatique(new Mur(this), 9, 8);
+        addEntiteStatique(new Mur(this), 10, 6);
+        addEntiteStatique(new Mur(this), 11, 6);
 
         addEntiteStatique(new CaseNormale(this), 6, 7);
         addEntiteStatique(new CaseNormale(this), 5, 8);
@@ -236,7 +248,10 @@ public class Jeu extends Observable implements Runnable {
      * Redémarre une partie
      */
     public void restart(){
-        heros.resetHero();
+        heros[0].resetHero();
+        heros[1].resetHero();
+        heros[2].resetHero();
+        heros[3].resetHero();
         reinitialisationDeSalle();
         initialisationDesEntites();
     }
@@ -253,20 +268,49 @@ public class Jeu extends Observable implements Runnable {
 
     public void run() {
 
+        /*
+        Coord2D dest = new Coord2D(10, 7);
+        Queue<Coord2D> path = getHeros().pathFind(dest);
+        Queue<Coord2D> pathPrint = new LinkedList<Coord2D>(path);
+        System.out.println("path:");
+        while(!pathPrint.isEmpty()) {
+            Coord2D print = pathPrint.remove();
+            System.out.println(print.x + " " + print.y);
+        }
+        */
+
         while (true) {
-            Coord2D dest = new Coord2D(10, 7);
+
             setChanged();
             notifyObservers();
-            if(getHeros().getNbVie() < 1) {
-                restart();
-            }
 
-            Queue<Coord2D> path = getHeros().pathFind(dest);
-            Coord2D next = path.remove();
-            System.out.println(next.x + " " + next.y);
+            /*
+            Coord2D curr = new Coord2D(getHeros().getX(), getHeros().getY());
+
+            System.out.println("curr: " + curr.x + " " + curr.y);
+            if(counter < 0 && !dest.equals(curr)) {
+                pathPrint = new LinkedList<Coord2D>(path);
+                System.out.println("path:");
+                while(!pathPrint.isEmpty()) {
+                    Coord2D print = pathPrint.remove();
+                    System.out.println(print.x + " " + print.y);
+                }
+                // if(path.isEmpty()) {
+                //    path = getHeros().pathFind(dest);
+                // }
+                Coord2D next = path.remove();
+                System.out.println("next: " + next.x + " " + next.y);
+                getHeros().moveTo(next);
+            }
+            counter--;
+            */
+            getHeros(0).run();
+            getHeros(1).run();
+            getHeros(2).run();
+            getHeros(3).run();
 
             try {
-                Thread.sleep(pause + 2000);
+                Thread.sleep(pause + 200);
             } catch (InterruptedException e) {
                 e.printStackTrace();
             }
@@ -338,5 +382,12 @@ public class Jeu extends Observable implements Runnable {
             default -> throw new IllegalArgumentException("La valeur minimale est 1 "
                     + "la valeur maximale est 8. ");
         };
+    }
+
+    public int checkClear(Coord2D target) {
+        for(int i = 0; i < 4; i++) {
+            if(target.equals(new Coord2D(heros[i].getX(), heros[i].getY()))) return i;
+        }
+        return -1;
     }
 }
