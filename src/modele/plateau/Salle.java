@@ -46,7 +46,12 @@ public class Salle{
      */
     public void salleAleatoire(Heros heros1, Heros heros2, Heros heros3, Heros heros4){
 
-        jeu.reinitialisationDeSalle();                                  //Réinisialise le tableau contenant la salle précédente
+        jeu.reinitialisationDeSalle();//Réinisialise le tableau contenant la salle précédente
+
+        heros1.setState(0);
+        heros2.setState(0);
+        heros3.setState(0);
+        heros4.setState(0);
 
         nomSalle = AleaNomSalle();                                      //Nom de la salle choisie aléatoirement
 

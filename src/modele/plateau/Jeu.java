@@ -47,10 +47,10 @@ public class Jeu extends Observable implements Runnable {
      * Constructeur de Jeu
      */
     public Jeu() {
-        heros[0] = new Heros(this, 0, 0, 0,'V');
-        heros[1] = new Heros(this, 0, 1, 1,'V');
-        heros[2] = new Heros(this, 1, 0, 2,'R');
-        heros[3] = new Heros(this, 1, 1, 3, 'R');
+        heros[0] = new Heros(this, 0, 0, 0,'R');
+        heros[1] = new Heros(this, 0, 1, 1,'R');
+        heros[2] = new Heros(this, 1, 0, 2,'V');
+        heros[3] = new Heros(this, 1, 1, 3, 'V');
         tour = new CompteurGlobale(NB_TOUR);
         tabCasePiegeMobile = new CasePiegeMobile[MAX_PIEGE_MOBILE];
         compteurPiegeMobile = 0;
@@ -310,7 +310,7 @@ public class Jeu extends Observable implements Runnable {
             getHeros(3).run();
 
             try {
-                Thread.sleep(pause + 200);
+                Thread.sleep(100);
             } catch (InterruptedException e) {
                 e.printStackTrace();
             }

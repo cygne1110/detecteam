@@ -137,6 +137,8 @@ public class Heros {
         y = x2;
     }
 
+    public void setState(int s) {this.state = 0;}
+
 
     public void setNbVie(int nbVie) { this.nbVie = nbVie;}
 
@@ -181,7 +183,7 @@ public class Heros {
     public void EstSurLevier(int x,int y){
         EntiteStatique e = jeu.getEntite(x, y);
         if(e instanceof Levier){
-            if(getCouleur() == ((Levier) e).getCouleur() || ((Levier) e).getCouleur() == 'B' || getCouleur() == 'B') {
+            if(getCouleur() == ((Levier) e).getCouleur() || ((Levier) e).getCouleur() == 'B') {
                 if (((Levier) e).getActive() == false) {
                     ((Levier) e).activerLevier();
                     EntiteStatique[][] GrilleEntitesStatiques = getJeu().getGrilleEntitesStatiques();
@@ -208,7 +210,7 @@ public class Heros {
         if(jeu.getEntite(x, y) instanceof Porte){
             EntiteStatique e = jeu.getEntite(x, y);
             if(((Porte) e).getFinale()) {
-                //jeu.getSalle().salleAleatoire(jeu.getHeros()); //On appelle la méthode qui créer les salles aléatoirement
+                jeu.getSalle().salleAleatoire(jeu.getHeros(0), jeu.getHeros(1), jeu.getHeros(2), jeu.getHeros(3)); //On appelle la méthode qui créer les salles aléatoirement
                 resetHeroSalle();
             }
         }
@@ -448,78 +450,119 @@ public class Heros {
             explored[x-1][y] = true;
             Coord2D target = new Coord2D(x-1, y);
             if(info(target)) {
-                action(target);
+                //action(target);
             }
         }
         if(x + 1 < jeu.SIZE_X) {
             explored[x+1][y] = true;
             Coord2D target = new Coord2D(x+1, y);
             if(info(target)) {
-                action(target);
+                //action(target);
             }
         }
         if(y - 1 > 0) {
             explored[x][y-1] = true;
             Coord2D target = new Coord2D(x, y-1);
             if(info(target)) {
-                action(target);
+                //action(target);
             }
         }
         if(y + 1 < jeu.SIZE_Y) {
             explored[x][y+1] = true;
             Coord2D target = new Coord2D(x, y+1);
             if(info(target)) {
-                action(target);
+                //action(target);
             }
         }
     }
 
     public void explore() {
-        Random rand = new Random();
         boolean moved = false;
-        // exploredThreshold =
+        int exploredThreshold = 3;
+        int tmp;
+        Random rand = new Random();
         while(!moved) {
-            int choice = rand.nextInt(0, 4);
-            System.out.println(choice);
-            switch(choice) {
-                case 0:
-                    if(x - 1 > 0 && checkClear(new Coord2D(x - 1, y)) == -1) {
-                        moved = moveTo(new Coord2D(x - 1, y));
-                    }
-                    break;
-                case 1:
-                    if(x + 1 < jeu.SIZE_X && checkClear(new Coord2D(x + 1, y)) == -1) {
-                        moved = moveTo(new Coord2D(x + 1, y));
-                    }
-                    break;
-                case 2:
-                    if(y - 1 > 0 && checkClear(new Coord2D(x, y-1)) == -1) {
-                        moved = moveTo(new Coord2D(x, y - 1));
-                    }
-                    break;
-                case 3:
-                    if(y + 1 < jeu.SIZE_Y && checkClear(new Coord2D(x, y+1)) == -1) {
-                        moved = moveTo(new Coord2D(x, y + 1));
-                    }
-                    break;
+            int i = rand.nextInt(0, 4);
+            if(i == 0 && x - 1 > 0 && checkClear(new Coord2D(x - 1, y)) == -1) {
+                tmp = checkExplored(new Coord2D(x-1, y), 0);
+                if(tmp >= exploredThreshold) {
+                    moved = moveTo(new Coord2D(x-1, y));
+                }
+            } else if(i == 1 && x + 1 < jeu.SIZE_X && checkClear(new Coord2D(x + 1, y)) == -1) {
+                tmp = checkExplored(new Coord2D(x+1, y), 1);
+                if(tmp >= exploredThreshold) {
+                    moved = moveTo(new Coord2D(x+1, y));
+                }
+            } else if(i == 2 && y - 1 > 0 && checkClear(new Coord2D(x, y-1)) == -1) {
+                tmp = checkExplored(new Coord2D(x, y-1), 2);
+                if(tmp >= exploredThreshold) {
+                    moved = moveTo(new Coord2D(x, y-1));
+                }
+            } else if(i == 3 && y + 1 < jeu.SIZE_Y && checkClear(new Coord2D(x, y+1)) == -1) {
+                tmp = checkExplored(new Coord2D(x, y+1), 3);
+                if(tmp >= exploredThreshold) {
+                    moved = moveTo(new Coord2D(x, y+1));
+                }
             }
+            exploredThreshold--;
         }
     }
 
+    private int checkExplored(Coord2D target, int prev) {
+        int res = 0;
+        if(prev != 0 && target.x - 1 > 0) {
+            res++;
+        }
+        if(prev != 1 && target.x + 1 < jeu.SIZE_X) {
+            res++;
+        }
+        if(prev != 2 && target.y - 1 > 0) {
+            res++;
+        }
+        if(prev != 3 && target.y + 1 < jeu.SIZE_Y) {
+            res++;
+        }
+        return res;
+    }
+
+    private Coord2D checkFinale() {
+        for (int i = 0; i < getJeu().SIZE_X; i++) {
+            for (int j = 0; j < getJeu().SIZE_Y; j++) {
+                if (grid[i][j] instanceof Porte) {
+                    if (((Porte) grid[i][j]).getIndice() == ((Levier) grid[x][y]).getIndice()) {
+                        if (((Porte) grid[i][j]).getFinale()) {
+                            return new Coord2D(i, j);
+                        } else {
+                            return new Coord2D(-1, -1);
+                        }
+                    }
+                }
+            }
+        }
+        return new Coord2D(-1, -1);
+    }
     public void run() {
         discover();
-        System.out.println("run:" + indice + " " + state);
-        System.out.println("A");
+        if(destination == null || destination.equals(new Coord2D(x, y))) state = 0;
+        if(grid[x][y] instanceof Levier) {
+            Coord2D tmp = checkFinale();
+            if(!tmp.equals(new Coord2D(-1, -1))) {
+                state = 2;
+                destination = tmp;
+            }
+        }
         if(state == 0) {
-            System.out.println("C");
             explore();
         } else if(state == 1) {
             explore();
         } else if(state == 2) {
             Queue<Coord2D> path = pathFind(destination);
-            moveTo(path.remove());
+            if(path == null) {
+                state = 0;
+            } else {
+                moveTo(path.remove());
+            }
         }
-        System.out.println("B");
     }
 
 }
